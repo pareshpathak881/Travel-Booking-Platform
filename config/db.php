@@ -4,30 +4,32 @@ declare(strict_types=1);
 /**
  * IndiaYatra — Database Configuration
  *
- * Credentials are loaded from a .env file in the project root.
- * A lightweight line-by-line parser is used — no Composer dependency required.
- * Any required variable that is missing causes a loud, early failure instead of
- * silently connecting with null values.
+ * Credential resolution order:
+ *   1. Process environment (Vercel dashboard / server env vars)
+ *   2. Local .env file in the project root (development)
  *
  * Usage: $pdo = getPDO();
  */
 
-// ── Lightweight .env loader ────────────────────────────────────────────────
+// ── Lightweight .env loader (skipped when env vars are already injected) ──
 (static function (): void {
-    $envFile = dirname(__DIR__) . '/.env';
+    $alreadyConfigured = getenv('DB_HOST') !== false && getenv('DB_HOST') !== '';
+    if ($alreadyConfigured) {
+        return;
+    }
 
+    $envFile = dirname(__DIR__) . '/.env';
     if (!is_file($envFile)) {
-        // .env is missing entirely — fail loudly so a misconfigured deploy is
-        // caught immediately rather than producing cryptic downstream errors.
-        throw new RuntimeException(
-            '.env file not found. Copy .env.example to .env and fill in your credentials.'
-        );
+        return;
     }
 
     $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return;
+    }
+
     foreach ($lines as $line) {
         $line = trim($line);
-        // Skip comments and blank lines
         if ($line === '' || str_starts_with($line, '#')) {
             continue;
         }
@@ -40,8 +42,7 @@ declare(strict_types=1);
 })();
 
 /**
- * Read a required environment variable, throwing immediately if it is absent
- * or empty so that a misconfigured deploy fails loudly at boot time.
+ * Read a required environment variable from $_ENV or getenv().
  */
 function _env(string $key): string
 {
@@ -49,7 +50,8 @@ function _env(string $key): string
     if ($value === false || $value === '') {
         throw new RuntimeException(
             "Required environment variable '$key' is not set. "
-            . "Check your .env file against .env.example."
+            . "For local dev, copy .env.example to .env. "
+            . "For Vercel, add it under Project Settings → Environment Variables."
         );
     }
     return (string) $value;
@@ -68,9 +70,12 @@ function getPDO(): PDO
     $dbname  = _env('DB_NAME');
     $user    = _env('DB_USER');
     $pass    = _env('DB_PASS');
-    $charset = _env('DB_CHARSET');
+    $charset = $_ENV['DB_CHARSET'] ?? getenv('DB_CHARSET') ?: 'utf8mb4';
 
-    $dsn = "mysql:host={$host};dbname={$dbname};charset={$charset}";
+    $port = $_ENV['DB_PORT'] ?? getenv('DB_PORT') ?: '';
+    $portSegment = ($port !== false && $port !== '') ? ";port={$port}" : '';
+
+    $dsn = "mysql:host={$host}{$portSegment};dbname={$dbname};charset={$charset}";
 
     $options = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -83,7 +88,6 @@ function getPDO(): PDO
     try {
         $pdo = new PDO($dsn, $user, $pass, $options);
     } catch (PDOException $e) {
-        // Show a user-friendly styled error — never expose raw exception traces.
         http_response_code(503);
         echo '<!DOCTYPE html>
 <html lang="en">
@@ -99,14 +103,14 @@ function getPDO(): PDO
     .icon{font-size:3rem;margin-bottom:1rem}
     h1{font-size:1.5rem;color:#b91c1c;margin-bottom:.5rem}
     p{color:#6b7280;line-height:1.6;margin-bottom:1.5rem}
-    a{display:inline-block;padding:.7rem 1.8rem;background:#f97316;color:#fff;border-radius:.75rem;text-decoration:none;font-weight:600;font-size:.95rem}
+    a{display:inline-block;padding:.7rem 1.8rem;background:#2d6a4f;color:#fff;border-radius:.75rem;text-decoration:none;font-weight:600;font-size:.95rem}
   </style>
 </head>
 <body>
   <div class="card">
     <div class="icon">🔌</div>
     <h1>Database Unavailable</h1>
-    <p>We cannot connect to the database right now. Please check your <code>.env</code> file and ensure MySQL is running.</p>
+    <p>We cannot connect to the database right now. On Vercel, verify your cloud DB credentials in Environment Variables. Locally, check your <code>.env</code> file and ensure MySQL is running.</p>
     <a href="javascript:location.reload()">Try Again</a>
   </div>
 </body>
@@ -118,5 +122,4 @@ function getPDO(): PDO
 }
 
 // ── Backward-compatible global $pdo variable ───────────────────────────────
-// Existing files that reference $pdo directly will continue to work.
 $pdo = getPDO();
