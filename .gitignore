@@ -1,0 +1,7 @@
+node_modules/
+.env
+.venv/
+assets/js/app.min.js
+assets/css/app.min.css
+.DS_Store
+dist/

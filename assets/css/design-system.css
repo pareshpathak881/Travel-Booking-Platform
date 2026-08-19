@@ -1,0 +1,157 @@
+/* ==========================================================================
+   IndiaYatra Design System
+   Link this AFTER styles.css and AFTER the Tailwind CDN script in header.php:
+   <link rel="stylesheet" href="assets/css/design-system.css">
+   Everything here is additive/override-only — it doesn't replace styles.css.
+   ========================================================================== */
+
+:root {
+  /* Color — one primary accent, one neutral scale, 3 verticals max */
+  --ds-accent: #f97316;          /* orange-500 */
+  --ds-accent-dark: #ea580c;
+  --ds-vertical-package: #f97316; /* orange */
+  --ds-vertical-flight: #2563eb;  /* blue */
+  --ds-vertical-hotel: #0d9488;   /* teal */
+
+  --ds-neutral-50: #f8fafc;
+  --ds-neutral-100: #f1f5f9;
+  --ds-neutral-600: #475569;
+  --ds-neutral-900: #0f172a;
+
+  /* Type scale — 12/14/16/20/28/40 */
+  --ds-text-xs: 0.75rem;
+  --ds-text-sm: 0.875rem;
+  --ds-text-base: 1rem;
+  --ds-text-lg: 1.25rem;
+  --ds-text-xl: 1.75rem;
+  --ds-text-2xl: 2.5rem;
+
+  /* Motion */
+  --ds-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ds-duration: 250ms;
+
+  --ds-radius-card: 1rem;      /* rounded-2xl */
+  --ds-shadow-rest: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --ds-shadow-hover: 0 20px 40px rgba(15, 23, 42, 0.14);
+}
+
+/* ---- Backgrounds: never flat white-on-white ---- */
+body,
+main {
+  background: linear-gradient(180deg, var(--ds-neutral-50) 0%, var(--ds-neutral-100) 100%);
+}
+
+/* ---- Typography scale, enforced ---- */
+h1 { font-size: var(--ds-text-2xl); }
+h2 { font-size: var(--ds-text-xl); }
+h3 { font-size: var(--ds-text-lg); }
+body, p, li, td, input, select, textarea { font-size: var(--ds-text-base); color: var(--ds-neutral-600); }
+small, .text-xs { font-size: var(--ds-text-xs); }
+
+/* Body text should never be pure black */
+p, li, span:not([class*="text-white"]):not([class*="text-orange"]) {
+  color: var(--ds-neutral-600);
+}
+
+/* ---- Sticky header with shadow-on-scroll (JS toggles .is-scrolled) ---- */
+.site-header,
+header[class*="sticky"] {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  transition: box-shadow var(--ds-duration) var(--ds-ease);
+}
+.site-header.is-scrolled,
+header[class*="sticky"].is-scrolled {
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* ---- Cards: uniform radius, rest→hover shadow, lift ---- */
+.card,
+.package-card,
+article[class*="rounded"],
+.destination-card {
+  border-radius: var(--ds-radius-card) !important;
+  box-shadow: var(--ds-shadow-rest) !important;
+  transition: transform var(--ds-duration) var(--ds-ease),
+              box-shadow var(--ds-duration) var(--ds-ease) !important;
+}
+.card:hover,
+.package-card:hover,
+article[class*="rounded"]:hover,
+.destination-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ds-shadow-hover) !important;
+}
+
+/* Card images: fixed 4:3 ratio with hover zoom */
+.card img:first-child,
+.package-card-image-wrap img,
+article[class*="rounded"] > div:first-child img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform 400ms var(--ds-ease);
+}
+.card:hover img:first-child,
+.package-card:hover .package-card-image-wrap img,
+article[class*="rounded"]:hover > div:first-child img {
+  transform: scale(1.05);
+}
+
+/* ---- Vertical accent colors (badge/CTA) ---- */
+[data-vertical="package"] .badge, [data-vertical="package"] .cta { background: var(--ds-vertical-package); }
+[data-vertical="flight"]  .badge, [data-vertical="flight"]  .cta { background: var(--ds-vertical-flight); }
+[data-vertical="hotel"]   .badge, [data-vertical="hotel"]   .cta { background: var(--ds-vertical-hotel); }
+
+/* ---- Sidebar: sticky ---- */
+aside[class*="w-72"], .filters-sidebar {
+  position: sticky;
+  top: 6rem;
+}
+
+/* ---- Hero overlap panel ---- */
+.hero + .search-panel,
+.hero + #marketplace-root {
+  margin-top: -2.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+/* ---- Modals: fade + scale + blur, never instant ---- */
+.modal-overlay, [class*="backdrop-blur"] {
+  backdrop-filter: blur(8px);
+  transition: opacity var(--ds-duration) var(--ds-ease);
+}
+.modal-content, [role="dialog"] {
+  transition: transform var(--ds-duration) var(--ds-ease),
+              opacity var(--ds-duration) var(--ds-ease);
+}
+
+/* ---- Skeleton loaders (swap in for spinners) ---- */
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 37%, #e2e8f0 63%);
+  background-size: 400% 100%;
+  animation: ds-skeleton-loading 1.4s ease infinite;
+  border-radius: var(--ds-radius-card);
+}
+@keyframes ds-skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ---- Empty state ---- */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+.empty-state .empty-cta {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background: var(--ds-accent);
+  color: white;
+  font-weight: 700;
+  transition: background var(--ds-duration) var(--ds-ease);
+}
+.empty-state .empty-cta:hover { background: var(--ds-accent-dark); }
