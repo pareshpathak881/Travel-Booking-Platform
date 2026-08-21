@@ -83,7 +83,7 @@ function getPDO(): PDO
         if (!headers_sent()) {
             http_response_code(503);
         }
-        echo "<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Database Unavailable</title></head><body><h2>Database Unavailable</h2></body></html>";
+        echo "<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Database Unavailable — IndiaYatra</title><style>body{font-family:sans-serif;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}.card{background:#fff;border-radius:1rem;padding:2.5rem;max-width:420px;text-align:center;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1)}.btn{display:inline-block;margin-top:1.25rem;background:#15803d;color:#fff;padding:0.6rem 1.25rem;border-radius:0.5rem;text-decoration:none}</style></head><body><div class="card"><svg width="48" height="48" fill="none" stroke="#ef4444" viewBox="0 0 24 24" style="margin:0 auto 1rem"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><h2 style="margin:0 0 0.5rem;color:#0f172a">Database Unavailable</h2><p style="color:#64748b;font-size:0.95rem;line-height:1.5">Could not establish connection to the remote MySQL server. Verify credentials and cloud network access.</p><a href="/" class="btn">Try Again</a></div></body></html>";
         exit(1);
     }
 
