@@ -65,9 +65,10 @@ function getPDO(): PDO
 
     $dsn = "mysql:host={$host}{$portSegment};dbname={$dbname};charset={$charset}";
 
-    $foundRowsAttr = defined("Pdo\\Mysql::ATTR_FOUND_ROWS")
-        ? Pdo\Mysql::ATTR_FOUND_ROWS
-        : PDO::MYSQL_ATTR_FOUND_ROWS;
+    // Use constant() dynamically to prevent PHP 8.5 deprecation notice during code compilation
+    $foundRowsAttr = defined('Pdo\Mysql::ATTR_FOUND_ROWS')
+        ? constant('Pdo\Mysql::ATTR_FOUND_ROWS')
+        : @constant('PDO::MYSQL_ATTR_FOUND_ROWS');
 
     $options = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
