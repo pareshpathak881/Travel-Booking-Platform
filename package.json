@@ -4,9 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev":   "vite build --watch",
-    "build": "vite build",
-    "lint":  "eslint src --ext .js,.jsx"
+    "dev":       "vite build --watch",
+    "build":     "vite build && npm run build:css",
+    "build:css": "tailwindcss -i ./src/index.css -o ./dist/assets/css/app.min.css --minify",
+    "postbuild": "node scripts/postbuild.js",
+    "lint":      "eslint src --ext .js,.jsx"
   },
   "dependencies": {
     "react":     "^18.2.0",

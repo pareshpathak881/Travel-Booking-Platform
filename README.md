@@ -63,8 +63,8 @@ In **Settings → General**:
 | Setting | Value |
 |---|---|
 | Framework Preset | **Other** |
-| Build Command | *(leave default — `vercel.json` runs `npm run build`)* |
-| Output Directory | **`.`** (single dot) |
+| Build Command | *(handled by `vercel.json` — runs `npm run build`)* |
+| Output Directory | **`dist`** |
 
 In **Settings → Environment Variables**, add:
 

@@ -9,19 +9,19 @@ export default defineConfig({
   plugins: [react()],
 
   build: {
-    outDir: path.resolve(__dirname, 'assets'),
-    emptyOutDir: false,
+    outDir: path.resolve(__dirname, 'dist'),
+    emptyOutDir: true,
 
     rollupOptions: {
       external: ['react', 'react-dom'],
       input: path.resolve(__dirname, 'src/main.jsx'),
       output: {
         format: 'iife',
-        entryFileNames: 'js/app.min.js',
-        chunkFileNames:  'js/chunks/[name].js',
+        entryFileNames: 'assets/js/app.min.js',
+        chunkFileNames: 'assets/js/chunks/[name].js',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-            return 'css/app.min.css';
+            return 'assets/css/app.min.css';
           }
           return 'assets/[name][extname]';
         },
